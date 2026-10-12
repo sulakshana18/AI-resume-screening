@@ -1,39 +1,21 @@
 import re
 
 
-def clean_resume_text(text):
+def normalize_whitespace(text):
+    """Collapse repeated whitespace while preserving meaningful text."""
+    if not isinstance(text, str):
+        return ""
+    return re.sub(r"\s+", " ", text).strip()
 
+
+def clean_resume_text(text):
+    """Clean resume text while preserving technical terms and skills."""
     if not isinstance(text, str):
         return ""
 
-    text = text.lower()
-
-    # Remove email
-    text = re.sub(
-        r'\S+@\S+',
-        ' ',
-        text
-    )
-
-    # Remove URLs
-    text = re.sub(
-        r'http\S+|www\S+',
-        ' ',
-        text
-    )
-
-    # Remove special characters
-    text = re.sub(
-        r'[^a-zA-Z0-9\s]',
-        ' ',
-        text
-    )
-
-    # Remove extra spaces
-    text = re.sub(
-        r'\s+',
-        ' ',
-        text
-    )
-
-    return text.strip()
+    cleaned = text.replace("\r", " ").replace("\n", " ")
+    cleaned = re.sub(r"https?://\S+|www\.\S+", " ", cleaned, flags=re.IGNORECASE)
+    cleaned = re.sub(r"\S+@\S+", " ", cleaned)
+    cleaned = re.sub(r"[^A-Za-z0-9+#.\s/:_-]", " ", cleaned)
+    cleaned = normalize_whitespace(cleaned)
+    return cleaned.lower()
